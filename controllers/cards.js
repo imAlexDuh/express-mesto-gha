@@ -37,7 +37,7 @@ const deleteCard = (req, res) => {
   )
   .then((cards) => {
     if (!cards) { return res.status(404).send({ message: 'Такой карточки нет.' }); }
-    return res.send(cards);
+    return cards.remove().then(() => res.status(200).send(cards));
   })
 
     .catch(() => {
