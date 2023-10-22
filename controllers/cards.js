@@ -30,16 +30,16 @@ const createCard = (req, res) => {
 }
 
 const deleteCard = (req, res) => {
-  const id = req.params.cardId;
-  Card.findByIdAndRemove(id)
-    .then((card) => {
-      if (!card) {
-        res.status(404).send({ message: "Карточка с указанным id не найдена." });
-        return;
-      }
-      res.status(200).send(card);
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((cards) => {
+      res.status(200).send({ data: cards });
     })
     .catch(() => {
+      res.status(400).send({ message: `Переданы некорректные данные` });
       res.status(500).send({ message: `Внутренняя ошибка сервера` });
     })
 }
@@ -51,6 +51,7 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((cards) => res.send({ cards }))
+
     .catch(() => {
       res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
       res.status(500).send({ message: `Внутренняя ошибка сервера` });
@@ -64,6 +65,7 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((cards) => res.send({ cards }))
+
     .catch(() => {
       res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
       res.status(500).send({ message: `Внутренняя ошибка сервера` });
