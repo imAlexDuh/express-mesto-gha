@@ -4,7 +4,7 @@ const getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
       if (cards.length === 0) {
-        res.status(404).send({ message: "Карточка с указанным id не найдена." });
+        res.status(404).send({ message: "Карточки не найдены." });
         return;
       }
       res.status(200).send(cards);
@@ -17,8 +17,7 @@ const getCards = (req, res) => {
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
+  Card.create({ name, link })
     .then((card) => {
       res.status(200).send(card);
     })
