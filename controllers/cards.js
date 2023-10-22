@@ -33,7 +33,7 @@ const deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
   .then((cards) => {
     if (!cards) { return res.status(404).send({ message: 'Такой карточки нет.' }); }
-    return cards.remove().then(() => res.status(200).send(cards));
+    return cards.remove().then(() => res.send({ cards }));
   })
 
     .catch(() => {
