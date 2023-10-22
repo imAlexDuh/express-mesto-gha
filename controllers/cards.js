@@ -3,9 +3,6 @@ const Card = require('../models/card');
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
-      if (cards.length === 0) {
-        res.status(404).send({ message: "Карточки не найдены." });
-      }
       res.status(200).send(cards);
     })
     .catch(() => {
