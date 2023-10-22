@@ -5,6 +5,7 @@ const getCards = (req, res) => {
     .then((cards) => {
       if (cards.length === 0) {
         res.status(404).send({ message: "Карточки не найдены." });
+        return
       }
       res.status(200).send(cards);
     })
@@ -32,7 +33,7 @@ const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
   .then((cards) => {
     if (!cards) { return res.status(404).send({ message: 'Такой карточки нет.' }); }
-    return res.status(200).send(cards);
+    return cards.remove().res.status(200).send(cards);
   })
 
     .catch(() => {
