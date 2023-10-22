@@ -5,7 +5,6 @@ const getCards = (req, res) => {
     .then((cards) => {
       if (cards.length === 0) {
         res.status(404).send({ message: "Карточки не найдены." });
-        return;
       }
       res.status(200).send(cards);
     })
