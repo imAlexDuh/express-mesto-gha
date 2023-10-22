@@ -45,7 +45,11 @@ const deleteCard = (req, res) => {
 }
 
 const likeCard = (req, res) => {
-  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
+  )
     .then((cards) => res.send({ data: cards }))
     .catch(() => {
       res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
