@@ -35,3 +35,8 @@ app.use('/', usersRoutes);
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
+
+app.use('*', (req, res) => {
+  res
+    .send({ message: `Страницы ${req.baseUrl} не существует` });
+});
