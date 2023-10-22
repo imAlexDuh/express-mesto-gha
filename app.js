@@ -28,6 +28,16 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((req, res, next) => {
+  req.card = {
+    "name":"aboba",
+    "link":"https://aboba.ru",
+    "owner":"6535896c244ffd34394b5a0e"
+  };
+
+  next();
+});
+
 app.use('/', cardsRoutes);
 
 app.use('/', usersRoutes);
