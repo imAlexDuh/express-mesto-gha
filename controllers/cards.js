@@ -50,7 +50,7 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.send({ cards }))
     .catch(() => {
       res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
       res.status(500).send({ message: `Внутренняя ошибка сервера` });
@@ -63,7 +63,7 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((cards) => res.send({ data: cards }))
+    .then((cards) => res.send({ cards }))
     .catch(() => {
       res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
       res.status(500).send({ message: `Внутренняя ошибка сервера` });
