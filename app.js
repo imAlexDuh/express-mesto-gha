@@ -37,5 +37,5 @@ app.listen(PORT, () => {
 });
 
 app.use('*', (req, res) => {
-  res.status(404).send({ message: `Страницы ${req.baseUrl} не существует` });
+  res.status(404).send({ message: `Такой страницы не существует` });
 });
