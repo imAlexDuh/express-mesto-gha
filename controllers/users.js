@@ -46,14 +46,17 @@ const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
-    .then((user) => {
-      if (!user) { return res.status(404).send({ message: 'Пользователь не найден' }); }
-      return res.send({ data: user });
+    .then((users) => {
+      if (users.length === 0) {
+        res.status(404).send({ message: "Пользователь не найдены" });
+        return;
+      }
+      res.status(200).send(users);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы неверные данные пользователя.' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-    });
+    .catch(() => {
+      res.status(400).send({ message: `Переданы некорректные данные` });
+      res.status(500).send({ message: `Внутренняя ошибка сервера` });
+    })
 };
 
 const patchMeAvatar = (req, res) => {
