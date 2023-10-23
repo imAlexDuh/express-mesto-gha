@@ -9,10 +9,11 @@ const getUsers = (req, res) => {
       }
       res.status(200).send(users);
     })
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+
+    .catch((err) => {
+      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' }); }
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
 
 const getUserById = (req, res) => {
@@ -24,10 +25,13 @@ const getUserById = (req, res) => {
       }
       res.status(200).send(user);
     })
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
 
 const postUsers = (req, res) => {
@@ -35,11 +39,12 @@ const postUsers = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(200).send(user);
+      res.status(201).send(user);
     })
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные при создании пользователя.` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
+
+    .catch((err) => {
+      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' }); }
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -51,9 +56,11 @@ const updateUserProfile = (req, res) => {
       if (!user) { return res.status(404).send({ message: 'Пользователь не найден' }); }
       res.status(200).send(user);
     })
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные при создании пользователя.` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -67,8 +74,10 @@ const patchMeAvatar = (req, res) => {
       return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные при обновлении аватара' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
