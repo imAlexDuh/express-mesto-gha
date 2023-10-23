@@ -32,11 +32,12 @@ const deleteCard = (req, res) => {
     return res.status(200).send(cards);
   })
 
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' });
-     }
-    });
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные.' });
+    }
+    res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+  });
 }
 
 const likeCard = (req, res) => {
@@ -53,7 +54,8 @@ const likeCard = (req, res) => {
   .catch((err) => {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Переданы некорректные данные.' });
-   }
+    }
+    res.status(500).send({ message: 'Внутренняя ошибка сервера' });
   });
 };
 
@@ -71,7 +73,8 @@ const dislikeCard = (req, res) => {
   .catch((err) => {
     if (err.name === 'CastError') {
       res.status(400).send({ message: 'Переданы некорректные данные.' });
-   }
+    }
+    res.status(500).send({ message: 'Внутренняя ошибка сервера' });
   });
 };
 
