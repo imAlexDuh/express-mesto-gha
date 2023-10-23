@@ -5,10 +5,10 @@ const getCards = (req, res) => {
     .then((cards) => {
       res.status(200).send(cards);
     })
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
 
 const createCard = (req, res) => {
@@ -17,12 +17,12 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(200).send(card);
+      res.status(201).send(card);
     })
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные при создании карточки.` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' }); }
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 }
 
 const deleteCard = (req, res) => {
@@ -32,10 +32,11 @@ const deleteCard = (req, res) => {
     return res.status(200).send(cards);
   })
 
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+     }
+    });
 }
 
 const likeCard = (req, res) => {
@@ -49,10 +50,11 @@ const likeCard = (req, res) => {
     return res.send({ cards });
   })
 
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные.' });
+   }
+  });
 };
 
 const dislikeCard = (req, res) => {
@@ -66,10 +68,11 @@ const dislikeCard = (req, res) => {
     return res.send({ cards });
   })
 
-    .catch(() => {
-      res.status(400).send({ message: `Переданы некорректные данные для постановки/снятии лайка.` });
-      res.status(500).send({ message: `Внутренняя ошибка сервера` });
-    })
+  .catch((err) => {
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: 'Переданы некорректные данные.' });
+   }
+  });
 };
 
 module.exports = {

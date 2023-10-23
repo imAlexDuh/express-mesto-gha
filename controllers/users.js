@@ -61,7 +61,7 @@ const updateUserProfile = (req, res) => {
 const patchMeAvatar = (req, res) => {
   const { name, avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, avatar }, { new: true })
+  User.findByIdAndUpdate(req.user._id, { name, avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) { return res.status(404).send({ message: 'Пользователь с указанным id не найден.' }); }
       return res.send({ data: user });
