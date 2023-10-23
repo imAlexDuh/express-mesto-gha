@@ -4,7 +4,7 @@ const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
       if (users.length === 0) {
-        res.status(404).send({ message: "Пользователь не найдены" });
+        res.status(404).send({ message: 'Пользователь не найдены' });
         return;
       }
       res.status(200).send(users);
@@ -20,7 +20,7 @@ const getUserById = (req, res) => {
   User.findById(req.params.id)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: `Пользователь по указанному id не найден` });
+        res.status(404).send({ message: 'Пользователь по указанному id не найден' });
         return;
       }
       res.status(200).send(user);
@@ -54,14 +54,13 @@ const updateUserProfile = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) { return res.status(404).send({ message: 'Пользователь не найден' }); }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
-
 
 const patchMeAvatar = (req, res) => {
   const { name, avatar } = req.body;
