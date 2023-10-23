@@ -5,6 +5,8 @@ const BodyParser = require('body-parser');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
 });
 
 const app = express();
