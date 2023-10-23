@@ -14,7 +14,7 @@ const getCards = (req, res) => {
 const createCard = (req, res) => {
   const { name, link } = req.body;
 
-  Card.create({ name, link })
+  Card.create({ name, link, owner:req.user._id })
     .then((card) => {
       res.status(201).send(card);
     })
@@ -23,7 +23,7 @@ const createCard = (req, res) => {
       if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' }); }
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
-}
+};
 
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
