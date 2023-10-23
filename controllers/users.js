@@ -60,7 +60,7 @@ const updateUserProfile = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные.' });
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -77,7 +77,7 @@ const patchMeAvatar = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные.' });
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
