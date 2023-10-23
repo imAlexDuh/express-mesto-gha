@@ -32,10 +32,10 @@ app.use('/', cardsRoutes);
 
 app.use('/', usersRoutes);
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
-
 app.use('*', (req, res) => {
   res.status(404).send({ message: `Такой страницы не существует` });
+});
+
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
 });
