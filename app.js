@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
+const BodyParser = require('body-parser');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
@@ -10,9 +10,8 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
 const app = express();
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.json());
+app.use(BodyParser.json());
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
