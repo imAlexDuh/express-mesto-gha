@@ -52,7 +52,6 @@ const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-  .orFail(new Error('CastError'))
     .then((user) => {
       if (!user) { return res.status(404).send({ message: 'Пользователь не найден' }); }
       res.status(200).send(user);
@@ -70,7 +69,6 @@ const patchMeAvatar = (req, res) => {
   const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, avatar }, { new: true, runValidators: true })
-    .orFail(new Error('CastError'))
     .then((user) => {
       if (!user) { return res.status(404).send({ message: 'Пользователь с указанным id не найден.' }); }
       return res.send({ user });
@@ -79,7 +77,6 @@ const patchMeAvatar = (req, res) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные.' });
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
