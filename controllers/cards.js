@@ -20,9 +20,9 @@ const getCards = (req, res) => {
     .then((cards) => {
       res.status(200).send(cards);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+
+    .catch(() => {
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
