@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const auth = require('./middlewares/auth');
+const centralErrors = require('./middlewares/centralerrcontrol');
 /* eslint-disable no-console */
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
 app.use(routes);
+app.use(centralErrors);
 
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
