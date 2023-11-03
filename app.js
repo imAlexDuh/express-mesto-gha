@@ -3,11 +3,23 @@ const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
 // const auth = require('./middlewares/auth');
-
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+/* eslint-disable no-console */
 
 const app = express();
 const routes = require('./routes/routes');
+
+const { PORT = 3000 } = process.env;
+
+async function run() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/mestodb');
+  } catch (error) {
+    console.log(error);
+  }
+  app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}`);
+  });
+}
 
 // app.use(auth);
 app.use(BodyParser.json());
@@ -18,14 +30,9 @@ app.use(routes);
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 
-const { PORT = 3000 } = process.env;
-
 app.use('/', cardsRoutes);
 app.use('/', usersRoutes);
 app.post('/signin', usersRoutes);
 app.post('/signup', usersRoutes);
 
-/* eslint-disable no-console */
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+run();
