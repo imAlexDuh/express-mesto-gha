@@ -87,6 +87,7 @@ const postUsers = (req, res) => {
       {
         name, about, avatar, email, password: hash,
       },
+      { new: true, runValidators: true },
     ))
     .then((user) => {
       res.send(user);
