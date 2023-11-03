@@ -22,7 +22,7 @@ async function run() {
   });
 }
 
-// app.use(auth);
+app.use(auth);
 app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
