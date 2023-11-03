@@ -2,14 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
-const auth = require('./middlewares/auth');
+// const auth = require('./middlewares/auth');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 const app = express();
 const routes = require('./routes/routes');
 
-app.use(auth);
+// app.use(auth);
 app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
