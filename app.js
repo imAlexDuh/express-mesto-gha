@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
+const auth = require('./middlewares/auth');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
@@ -16,17 +17,11 @@ const usersRoutes = require('./routes/users');
 
 const { PORT = 3000 } = process.env;
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6532ce419cf7cfbec50c6791',
-  };
-
-  next();
-});
-
+app.use(auth);
 app.use('/', cardsRoutes);
-
 app.use('/', usersRoutes);
+app.post('/signin', usersRoutes);
+app.post('/signup', usersRoutes);
 
 app.use('*', (req, res) => {
   res.status(404).send({ message: 'Такой страницы не существует' });

@@ -1,4 +1,32 @@
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
+
+const SECRET = 'secretkey';
+
+// eslint-disable-next-line consistent-return
+const login = (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) return res.status(400).send({ message: 'Почта или пароль не могут быть пустыми' });
+  User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) return res.status(401).send({ message: 'Неправильная почта или пароль' });
+      return bcrypt.compare(password, user.password)
+
+        .then((isValidPassword) => {
+          if (!isValidPassword) return res.status(401).send({ message: 'Неправильная почта или пароль' });
+          const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
+          return res.status(200)
+            .cookie('jwt', token, {
+              maxAge: 3600000,
+              httpOnly: true,
+              sameSite: true,
+            })
+
+            .end();
+        });
+    });
+};
 
 const getUsers = (req, res) => {
   User.find({})
@@ -34,9 +62,13 @@ const getUserById = (req, res) => {
 };
 
 const postUsers = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({
+    name, about, avatar, email, password,
+  })
     .then((user) => {
       res.status(201).send(user);
     })
@@ -81,4 +113,5 @@ module.exports = {
   postUsers,
   updateUserProfile,
   patchMeAvatar,
+  login,
 };
