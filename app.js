@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 /* eslint-disable no-console */
 
 const app = express();
@@ -21,7 +21,7 @@ async function run() {
   });
 }
 
-// app.use(auth);
+app.use(auth);
 app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
