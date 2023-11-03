@@ -7,6 +7,7 @@ module.exports = (req, res, next) => {
       .status(401)
       .send({ message: 'Необходима авторизация' });
   }
+
   const token = req.cookies.jwt;
   let payload;
   try {
