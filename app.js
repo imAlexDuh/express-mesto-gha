@@ -27,7 +27,6 @@ app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
 app.use(routes);
-app.use(centralErrors);
 
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
@@ -36,5 +35,7 @@ app.use('/', cardsRoutes);
 app.use('/', usersRoutes);
 app.post('/signin', usersRoutes);
 app.post('/signup', usersRoutes);
+
+app.use(centralErrors);
 
 run();
