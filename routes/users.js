@@ -2,7 +2,7 @@ const usersRouter = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
-const biba = /^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
+const ava = /^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
 
 const {
   getUsers, getUserById, postUsers, updateUserProfile, patchMeAvatar, login, getCurrentUser,
@@ -23,7 +23,7 @@ usersRouter.post('/signup', celebrate({
     }),
     password: Joi.string().required(),
     avatar: Joi.string().custom((value, helpers) => {
-      if (biba.test(value)) {
+      if (ava.test(value)) {
         return value;
       }
       return helpers.message('Некорректная ссылка');

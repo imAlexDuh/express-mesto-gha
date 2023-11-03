@@ -5,26 +5,17 @@ const User = require('../models/user');
 const SECRET = 'secretkey';
 
 // eslint-disable-next-line consistent-return
+
 const login = (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).send({ message: 'Почта или пароль не могут быть пустыми' });
-  User.findOne({ email }, { runValidators: true }).select('+password')
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) return res.status(401).send({ message: 'Неправильная почта или пароль' });
-      return bcrypt.compare(password, user.password)
-
-        .then((isValidPassword) => {
-          if (!isValidPassword) return res.status(401).send({ message: 'Неправильная почта или пароль' });
-          const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
-          return res.status(200)
-            .cookie('jwt', token, {
-              maxAge: 3600000,
-              httpOnly: true,
-              sameSite: true,
-            })
-
-            .end();
-        });
+      const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch(() => {
+      res.status(401).send({ message: 'Неправильные почта или пароль.' });
     });
 };
 
