@@ -8,7 +8,7 @@ const SECRET = 'secretkey';
 const login = (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).send({ message: 'Почта или пароль не могут быть пустыми' });
-  User.findOne({ email }).select('+password')
+  User.findOne({ email }, { runValidators: true }).select('+password')
     .then((user) => {
       if (!user) return res.status(401).send({ message: 'Неправильная почта или пароль' });
       return bcrypt.compare(password, user.password)
