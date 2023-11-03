@@ -82,17 +82,21 @@ const postUsers = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-
-  User.create({
-    name, about, avatar, email, password,
-  })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create(
+      {
+        name, about, avatar, email, password: hash,
+      },
+    ))
     .then((user) => {
-      res.status(201).send(user);
+      res.send(user);
     })
 
     .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные при создании карточки.' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
