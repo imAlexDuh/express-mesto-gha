@@ -2,11 +2,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
+const BadAuthError = require('../errors/BadAuthError');
+const BadRequestEr = require('../errors/BadRequestEr');
+const ExistingEmailEr = require('../errors/ExistingEmailEr');
+
 const SECRET = 'secretkey';
 
 // eslint-disable-next-line consistent-return
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -15,7 +19,7 @@ const login = (req, res) => {
       res.send({ token });
     })
     .catch(() => {
-      res.status(401).send({ message: 'Неправильные почта или пароль.' });
+      next(new BadAuthError('Неправильные почта или пароль.'));
     });
 };
 
@@ -75,7 +79,7 @@ const postUsers = (req, res, next) => {
   } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send({ message: 'Поля email и password обязательны' });
+    return res.status(BadRequestEr).send({ message: 'Поля email и password обязательны' });
   }
 
   return bcrypt.hash(req.body.password, 10)
@@ -89,10 +93,10 @@ const postUsers = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new 400('Переданы некорректные данные при создании пользователя'));
+        return next(new BadRequestEr('Переданы некорректные данные при создании пользователя'));
       }
       if (err.code === 11000) {
-        return next(new 400('Передан уже зарегистрированный email.'));
+        return next(new ExistingEmailEr('Передан уже зарегистрированный email.'));
       }
       return next(err);
     });
