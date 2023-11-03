@@ -69,26 +69,32 @@ const getUserById = (req, res) => {
     });
 };
 
-const postUsers = (req, res) => {
+const postUsers = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create(
-      {
-        name, about, avatar, email, password: hash,
-      },
-      { new: true, runValidators: true },
-    ))
-    .then((user) => {
-      res.send(user);
-    })
 
+  if (!email || !password) {
+    return res.status(400).send({ message: 'Поля email и password обязательны' });
+  }
+
+  return bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email: req.body.email, password: hash,
+    }))
+    .then((user) => {
+      res.status(200).send({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+      });
+    })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' });
+      if (err.name === 'ValidationError') {
+        return next(new 400('Переданы некорректные данные при создании пользователя'));
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      if (err.code === 11000) {
+        return next(new 400('Передан уже зарегистрированный email.'));
+      }
+      return next(err);
     });
 };
 
