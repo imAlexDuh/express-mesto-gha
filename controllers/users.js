@@ -28,11 +28,28 @@ const login = (req, res) => {
     });
 };
 
+const getCurrentUser = (req, res) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Пользователь не найден' });
+        return;
+      }
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
+      }
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
+};
+
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
       if (users.length === 0) {
-        res.status(404).send({ message: 'Пользователь не найдены' });
+        res.status(404).send({ message: 'Пользователи не найдены' });
         return;
       }
       res.status(200).send(users);
@@ -114,4 +131,5 @@ module.exports = {
   updateUserProfile,
   patchMeAvatar,
   login,
+  getCurrentUser,
 };
