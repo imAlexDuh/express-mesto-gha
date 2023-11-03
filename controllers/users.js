@@ -1,29 +1,28 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const ValidationError = require('../errors/ValidationError');
-const UserExistsError = require('../errors/UserExistsError');
 
 const SECRET = 'secretkey';
 
 // eslint-disable-next-line consistent-return
 const login = (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).send({ message: 'Email или пароль не могут быть пустыми' });
-  User.findOne({ email }).select('+password')
+  if (!email || !password) return res.status(400).send({ message: 'Почта или пароль не могут быть пустыми' });
+  User.findOne({ email }, { runValidators: true }).select('+password')
     .then((user) => {
-      if (!user) return res.status(401).send({ message: 'Неправильный email или пароль' });
+      if (!user) return res.status(401).send({ message: 'Неправильная почта или пароль' });
       return bcrypt.compare(password, user.password)
 
         .then((isValidPassword) => {
-          if (!isValidPassword) return res.status(401).send({ message: 'Неправильный email или пароль' });
+          if (!isValidPassword) return res.status(401).send({ message: 'Неправильная почта или пароль' });
           const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
-          return res.status(200).send({ message: 'Успешный вход' })
+          return res.status(200)
             .cookie('jwt', token, {
               maxAge: 3600000,
               httpOnly: true,
               sameSite: true,
             })
+
             .end();
         });
     });
@@ -79,7 +78,7 @@ const getUserById = (req, res) => {
     });
 };
 
-const postUsers = (req, res, next) => {
+const postUsers = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -91,18 +90,14 @@ const postUsers = (req, res, next) => {
       { new: true, runValidators: true },
     ))
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
 
-    /* eslint-disable consistent-return */
     .catch((err) => {
-      if (err.name === 'MongoServerError' && err.code === 11000) {
-        return next(new UserExistsError('Этот email уже занят'));
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
       }
-      if (err.name === 'ValidationError') {
-        return next(new ValidationError('Ошибка: Введены некорректные данные!'));
-      }
-      next(err);
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
