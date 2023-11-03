@@ -27,6 +27,7 @@ app.use('*', (req, res) => {
   res.status(404).send({ message: 'Такой страницы не существует' });
 });
 
+/* eslint-disable no-console */
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
