@@ -1,4 +1,4 @@
-const { ERROR_EXIST_EMAIL } = require('../middlewares/centralerrcontrol');
+const { ERROR_EXIST_EMAIL } = require('../constants');
 
 class ExistingEmailEr extends Error {
   constructor(message) {

@@ -1,4 +1,4 @@
-const { ERROR_BAD_REQUEST } = require('../middlewares/centralerrcontrol');
+const { ERROR_BAD_REQUEST } = require('../constants');
 
 class BadRequestErr extends Error {
   constructor(message) {

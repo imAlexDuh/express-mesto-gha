@@ -6,7 +6,7 @@ module.exports = (err, req, res, next) => {
     .status(statusCode)
     .send({
       message: statusCode === ERROR_INTERNAL
-        ? 'Ошибка по умолчанию.'
+        ? 'Ошибка.'
         : message,
     });
   return next();
