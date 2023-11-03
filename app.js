@@ -1,5 +1,4 @@
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
@@ -8,12 +7,13 @@ const auth = require('./middlewares/auth');
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 const app = express();
+const routes = require('./routes/routes');
 
-// app.use(auth);
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(auth);
 app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
+app.use(routes);
 
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
@@ -24,10 +24,6 @@ app.use('/', cardsRoutes);
 app.use('/', usersRoutes);
 app.post('/signin', usersRoutes);
 app.post('/signup', usersRoutes);
-
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Такой страницы не существует' });
-});
 
 /* eslint-disable no-console */
 app.listen(PORT, () => {
