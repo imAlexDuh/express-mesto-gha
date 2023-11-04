@@ -138,4 +138,5 @@ module.exports = {
   patchMeAvatar,
   login,
   getCurrentUser,
+  SECRET,
 };
