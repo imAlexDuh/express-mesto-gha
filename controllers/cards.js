@@ -1,47 +1,43 @@
 const Card = require('../models/card');
 
-const DelErr = require('../errors/DelErr');
-const NotExistErr = require('../errors/NotExistErr');
-const BadRequestErr = require('../errors/BadRequestErr');
-
-const createCard = (req, res, next) => {
+const createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.send({ card });
+      res.status(201).send(card);
     })
+
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestErr('Переданы некорректные данные при создании карточки.'));
-      }
-      return next(err);
+      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
-const getCards = (req, res, next) => {
+const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.send({ cards }))
-    .catch(next);
+    .then((cards) => {
+      res.status(200).send(cards);
+    })
+
+    .catch(() => {
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
 };
 
-const deleteCard = (req, res, next) => {
+const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((cards) => {
-      if (!cards) {
-        throw new NotExistErr('Карточка с указанным _id не найдена.');
-      } else if (!cards.owner.equals(req.user._id)) {
-        throw new DelErr('Попытка удалить чужую карточку.');
-      } else {
-        return cards.remove().then(() => res.status(200).send(cards));
-      }
+      if (!cards) { return res.status(404).send({ message: 'Такой карточки нет.' }); }
+      return res.status(200).send(cards);
     })
+
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestErr('Переданы некорректные данные при удалении карточки.'));
+        res.status(400).send({ message: 'Переданы некорректные данные.' });
       }
-      return next(err);
+      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
