@@ -58,14 +58,14 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotExistErr('/me Пользователь по указанному _id не найден.'));
+        next(new NotExistErr('Пользователь по указанному _id не найден.'));
       } else {
         res.send({ user });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new NotExistErr('/me Передан некорректный _id пользователя.'));
+        return next(new NotExistErr('Передан некорректный _id пользователя.'));
       }
       return next(err);
     });
@@ -79,21 +79,20 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(() => {
-      next(new NotExistErr('_id Ошибка. Пользователь не найден, попробуйте еще раз'));
-    })
+    // eslint-disable-next-line consistent-return
     .then((user) => {
-      if (user) {
-        res.send({ user });
-      } else {
-        throw new NotExistErr('_id Ошибка. Пользователь не найден, попробуйте еще раз');
+      if (!user) {
+        return next(new NotExistErr('Пользователь не найден'));
       }
+      res.send(user);
     })
+
+    // eslint-disable-next-line consistent-return
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestErr('_id Ошибка. Введен некорректный id пользователя'));
+        return next(new NotExistErr('Ошибка: Введен некорректный id пользователя'));
       }
-      return next(err);
+      next(err);
     });
 };
 
