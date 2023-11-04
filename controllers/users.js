@@ -73,19 +73,16 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(() => {
-      next(new NotExistErr('Ошибка. Пользователь не найден, попробуйте еще раз'));
-    })
     .then((user) => {
       if (user) {
-        res.send(user);
+        res.send({ user });
       } else {
-        throw (new NotExistErr('Ошибка. Пользователь не найден, попробуйте еще раз'));
+        throw new NotExistErr('Ошибка. Пользователь не найден, попробуйте еще раз');
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestErr(`Ошибка. ${req.params} Введен некорректный id пользователя`));
+        return next(new BadRequestErr('Ошибка. Введен некорректный id пользователя'));
       }
       return next(err);
     });
