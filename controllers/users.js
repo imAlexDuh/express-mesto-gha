@@ -58,17 +58,11 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotExistErr('Пользователь по указанному _id не найден.'));
-      } else {
-        res.send({ user });
+        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
       }
+      return res.status(200).send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new NotExistErr('Передан некорректный _id пользователя.'));
-      }
-      return next(err);
-    });
+    .catch((err) => next(err));
 };
 
 const getUsers = (req, res, next) => {
@@ -79,20 +73,21 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    // eslint-disable-next-line consistent-return
-    .then((user) => {
-      if (!user) {
-        return next(new BadRequestErr('Пользователь не найден'));
-      }
-      res.send(user);
+    .orFail(() => {
+      next(new NotExistErr('Ошибка. Пользователь не найден, попробуйте еще раз'));
     })
-
-    // eslint-disable-next-line consistent-return
+    .then((user) => {
+      if (user) {
+        res.send(user);
+      } else {
+        throw (new NotExistErr('Ошибка. Пользователь не найден, попробуйте еще раз'));
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new NotExistErr('Ошибка: Введен некорректный id пользователя'));
+        return next(new BadRequestErr(`Ошибка. ${req.params} Введен некорректный id пользователя`));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -102,16 +97,13 @@ const updateUserProfile = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        next(new NotExistErr('Пользователь по указанному _id не найден.'));
+        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
       }
       return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestErr('Переданы некорректные данные при обновлении пользователя'));
-      }
-      if (err.name === 'CastError') {
-        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
       }
       return next(err);
     });
