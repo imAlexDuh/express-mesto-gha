@@ -4,7 +4,7 @@ const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 const centralErrors = require('./middlewares/centralerrcontrol');
 const { login, postUsers } = require('./controllers/users');
 /* eslint-disable no-console */
@@ -27,7 +27,7 @@ async function run() {
   });
 }
 
-// app.use(auth);
+app.use(auth);
 app.use(BodyParser.json());
 app.use(express.json());
 app.use(errors());
