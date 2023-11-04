@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 
 const {
   ERROR_BAD_AUTH,
-} = require('../errors/BadAuthError');
+} = require('../errors/BadAuthErr');
 
 const userSchema = new mongoose.Schema({
   name: {
