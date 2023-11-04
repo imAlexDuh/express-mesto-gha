@@ -1,43 +1,47 @@
 const Card = require('../models/card');
 
-const createCard = (req, res) => {
+const DelErr = require('../errors/DelErr');
+const NotExistErr = require('../errors/NotExistErr');
+const BadRequestErr = require('../errors/BadRequestErr');
+
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(201).send(card);
+      res.send({ card });
     })
-
     .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestErr('Переданы некорректные данные при создании карточки.'));
+      }
+      return next(err);
     });
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => {
-      res.status(200).send(cards);
-    })
-
-    .catch(() => {
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-    });
+    .then((cards) => res.send({ cards }))
+    .catch(next);
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+const deleteCard = (req, res, next) => {
+  Сard.findByIdAndRemove(req.params.cardId)
     .then((cards) => {
-      if (!cards) { return res.status(404).send({ message: 'Такой карточки нет.' }); }
-      return res.status(200).send(cards);
+      if (!cards) {
+        throw new NotExistErr('Карточка с указанным _id не найдена.');
+      } else if (!cards.owner.equals(req.user._id)) {
+        throw new DelErr('Попытка удалить чужую карточку.');
+      } else {
+        return cards.remove().then(() => res.status(200).send(cards));
+      }
     })
-
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' });
+        return next(new BadRequestErr('Переданы некорректные данные при удалении карточки.'));
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
