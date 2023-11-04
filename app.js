@@ -25,7 +25,6 @@ async function run() {
 // app.use(auth);
 app.use(BodyParser.json());
 app.use(express.json());
-app.use(errors());
 app.use(routes);
 
 const cardsRoutes = require('./routes/cards');
@@ -35,6 +34,8 @@ app.use('/', cardsRoutes);
 app.use('/', router);
 app.post('/signin', router);
 app.post('/signup', router);
+
+app.use(errors());
 
 // app.use(centralErrors);
 
