@@ -2,9 +2,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
-const BadAuthError = require('../errors/BadAuthError');
-const BadRequestEr = require('../errors/BadRequestEr');
-const ExistingEmailEr = require('../errors/ExistingEmailEr');
+const BadAuthErr = require('../errors/BadAuthErr');
+const ExistingEmailErr = require('../errors/ExistingEmailErr');
+const NotExistErr = require('../errors/NotExistErr');
+const BadRequestErr = require('../errors/BadRequestErr');
 
 const SECRET = 'secretkey';
 const ROUND = 10;
@@ -20,7 +21,7 @@ const login = (req, res, next) => {
       res.send({ token });
     })
     .catch(() => {
-      next(new BadAuthError('Неправильные почта или пароль.'));
+      next(new BadAuthErr('Неправильные почта или пароль.'));
     });
 };
 
@@ -30,7 +31,7 @@ const postUsers = (req, res, next) => {
   } = req.body;
 
   if (!email || !password) {
-    return res.status(BadRequestEr).send({ message: 'Поля email и password обязательны' });
+    return res.status(BadRequestErr).send({ message: 'Поля email и password обязательны' });
   }
 
   return bcrypt.hash(req.body.password, ROUND)
@@ -44,90 +45,97 @@ const postUsers = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestEr('Переданы некорректные данные при создании пользователя'));
+        return next(new BadRequestErr('Переданы некорректные данные при создании пользователя'));
       }
       if (err.code === 11000) {
-        return next(new ExistingEmailEr('Передан уже зарегистрированный email.'));
+        return next(new ExistingEmailErr('Передан уже зарегистрированный email.'));
       }
       return next(err);
     });
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
+        next(new NotExistErr('/me Пользователь по указанному _id не найден.'));
+      } else {
+        res.send({ user });
       }
-      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' });
+        return next(new NotExistErr('/me Передан некорректный _id пользователя.'));
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => {
-      if (users.length === 0) {
-        res.status(404).send({ message: 'Пользователи не найдены' });
-        return;
-      }
-      res.status(200).send(users);
-    })
-
-    .catch(() => {
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
-    });
+    .then((result) => res.send(result))
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
-  User.findById(req.params.id)
-    .then((user) => {
-      if (!user) {
-        res.status(404).send({ message: 'Пользователь по указанному id не найден' });
-        return;
-      }
-      res.status(200).send(user);
+const getUserById = (req, res, next) => {
+  User.findById(req.params.userId)
+    .orFail(() => {
+      next(new NotExistErr('_id Ошибка. Пользователь не найден, попробуйте еще раз'));
     })
-
+    .then((user) => {
+      if (user) {
+        res.send({ user });
+      } else {
+        throw new NotExistErr('_id Ошибка. Пользователь не найден, попробуйте еще раз');
+      }
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные.' });
+        return next(new BadRequestErr('_id Ошибка. Введен некорректный id пользователя'));
       }
-      res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-const updateUserProfile = (req, res) => {
+const updateUserProfile = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
-      if (!user) { return res.status(404).send({ message: 'Пользователь не найден' }); }
-      return res.status(200).send(user);
+      if (!user) {
+        next(new NotExistErr('Пользователь по указанному _id не найден.'));
+      }
+      return res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestErr('Переданы некорректные данные при обновлении пользователя'));
+      }
+      if (err.name === 'CastError') {
+        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
+      }
+      return next(err);
     });
 };
 
-const patchMeAvatar = (req, res) => {
-  const { name, avatar } = req.body;
+const patchMeAvatar = (req, res, next) => {
+  const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
-      if (!user) { return res.status(404).send({ message: 'Пользователь с указанным id не найден.' }); }
+      if (!user) {
+        next(new NotExistErr('Пользователь по указанному _id не найден.'));
+      }
       return res.send({ user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') { return res.status(400).send({ message: 'Переданы некорректные данные.' }); }
-      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestErr('Переданы некорректные данные при обновлении пользователя'));
+      }
+      if (err.name === 'CastError') {
+        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
+      }
+      return next(err);
     });
 };
 
