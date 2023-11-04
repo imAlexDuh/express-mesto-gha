@@ -7,6 +7,7 @@ const BadRequestEr = require('../errors/BadRequestEr');
 const ExistingEmailEr = require('../errors/ExistingEmailEr');
 
 const SECRET = 'secretkey';
+const ROUND = 10;
 
 // eslint-disable-next-line consistent-return
 
@@ -20,6 +21,35 @@ const login = (req, res, next) => {
     })
     .catch(() => {
       next(new BadAuthError('Неправильные почта или пароль.'));
+    });
+};
+
+const postUsers = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  if (!email || !password) {
+    return res.status(BadRequestEr).send({ message: 'Поля email и password обязательны' });
+  }
+
+  return bcrypt.hash(req.body.password, ROUND)
+    .then((hash) => User.create({
+      name, about, avatar, email: req.body.email, password: hash,
+    }))
+    .then((user) => {
+      res.status(200).send({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+      });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return next(new BadRequestEr('Переданы некорректные данные при создании пользователя'));
+      }
+      if (err.code === 11000) {
+        return next(new ExistingEmailEr('Передан уже зарегистрированный email.'));
+      }
+      return next(err);
     });
 };
 
@@ -73,35 +103,6 @@ const getUserById = (req, res) => {
     });
 };
 
-const postUsers = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-
-  if (!email || !password) {
-    return res.status(BadRequestEr).send({ message: 'Поля email и password обязательны' });
-  }
-
-  return bcrypt.hash(req.body.password, 10)
-    .then((hash) => User.create({
-      name, about, avatar, email: req.body.email, password: hash,
-    }))
-    .then((user) => {
-      res.status(200).send({
-        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
-      });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestEr('Переданы некорректные данные при создании пользователя'));
-      }
-      if (err.code === 11000) {
-        return next(new ExistingEmailEr('Передан уже зарегистрированный email.'));
-      }
-      return next(err);
-    });
-};
-
 const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
@@ -138,5 +139,4 @@ module.exports = {
   patchMeAvatar,
   login,
   getCurrentUser,
-  SECRET,
 };
