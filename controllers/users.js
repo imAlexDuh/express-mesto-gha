@@ -65,7 +65,7 @@ const getCurrentUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new BadRequestErr('Ошибка: Введен некорректный id пользователя!'));
+        return next(new BadRequestErr('Введен некорректный id пользователя!'));
       }
       next(err);
     });
