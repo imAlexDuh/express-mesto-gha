@@ -7,7 +7,7 @@ const usersRouter = require('./routes/users');
 const auth = require('./middlewares/auth');
 const { postUsers, login } = require('./controllers/users');
 
-const { PORT = 3000, BASE_URL = 'http://localhost:3000' } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1/mestodb' } = process.env;
 
 const app = express();
 app.use(express.json());
@@ -19,7 +19,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-mongoose.connect(BASE_URL);
+mongoose.connect(DB_URL);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -38,7 +38,6 @@ app.post('/signup', celebrate({
   }),
 }), postUsers);
 
-app.use(auth);
 app.use('/users', auth, usersRouter);
 app.use(require('./routes/users'));
 
@@ -53,5 +52,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
-  console.log('Express is on port 3000', BASE_URL);
+  console.log('Express is on port 3000');
 });
