@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
@@ -58,11 +59,16 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
+        return next(new NotExistErr('Пользователь не найден'));
       }
-      return res.status(200).send(user);
+      res.status(200).send(user);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return next(new BadRequestErr('Ошибка: Введен некорректный id пользователя!'));
+      }
+      next(err);
+    });
 };
 
 const getUsers = (req, res, next) => {
