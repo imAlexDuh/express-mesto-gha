@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { Joi, errors, celebrate } = require('celebrate');
 const cookieParser = require('cookie-parser');
-const auth = require('./middlewares/auth');
+const router = require('./routes/default');
 const { postUsers, login } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
@@ -36,9 +36,7 @@ app.post('/signup', celebrate({
   }),
 }), postUsers);
 
-app.use(auth);
-app.use(require('./routes/users'));
-
+app.use(router);
 app.use(errors());
 
 app.use((err, req, res, next) => {
