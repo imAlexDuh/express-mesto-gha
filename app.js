@@ -36,6 +36,6 @@ app.post('/signin', router);
 app.post('/signup', router);
 
 app.use(errors());
-app.use(centralErrors);
+// app.use(centralErrors);
 
 run();
