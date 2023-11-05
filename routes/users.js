@@ -9,7 +9,13 @@ const {
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
-router.get('/users/:id', getUserById);
+router.get('/users/me', getCurrentUser);
+
+router.get('/users/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().length(24).hex(),
+  }),
+}), getUserById);
 
 router.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -43,8 +49,17 @@ router.post('/signin', celebrate({
   }),
 }), login);
 
-router.patch('/users/me', updateUserProfile);
-router.patch('/users/me/avatar', patchMeAvatar);
-router.get('/users/me', getCurrentUser);
+router.patch('/users/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+}), updateUserProfile);
+
+router.patch('/users/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
+  }),
+}), patchMeAvatar);
 
 module.exports = router;
