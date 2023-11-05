@@ -4,7 +4,6 @@ const cardRouter = require('./cards');
 const NotExistErr = require('../errors/NotExistErr');
 const auth = require('../middlewares/auth');
 
-// роуты, которым авторизация нужна
 router.use('/users', auth, userRouter);
 router.use('/cards', auth, cardRouter);
 router.use('*', auth, (req, res, next) => {
