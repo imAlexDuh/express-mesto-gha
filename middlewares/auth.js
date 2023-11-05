@@ -1,22 +1,23 @@
 const jwt = require('jsonwebtoken');
-const { SECRET } = require('../controllers/users');
 const BadAuthErr = require('../errors/BadAuthErr');
 
+// eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new BadAuthErr('Необходима авторизация.'));
+  const token = req.cookies.jwt;
+  if (!token) {
+    throw new BadAuthErr('Необходима авторизация');
   }
 
-  const token = authorization.replace('Bearer ', '');
-
   let payload;
+
   try {
-    payload = jwt.verify(token, SECRET);
+    const { NODE_ENV, SECRET } = process.env;
+    payload = jwt.verify(token, NODE_ENV === 'production' ? SECRET : 'dev-secret');
   } catch (err) {
-    return next(new BadAuthErr('Необходима авторизация.'));
+    next(new BadAuthErr('Необходима авторизация'));
+    return;
   }
 
   req.user = payload;
-  return next();
+  next();
 };
