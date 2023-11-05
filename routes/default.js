@@ -3,7 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./users');
 const cardRouter = require('./cards');
 const NotExistErr = require('../errors/NotExistErr');
-const auth = require('../middlewares/auth');
+// const auth = require('../middlewares/auth');
 
 const { postUsers, login } = require('../controllers/users');
 
