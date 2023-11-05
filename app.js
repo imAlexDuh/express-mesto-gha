@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { Joi, errors, celebrate } = require('celebrate');
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 const { postUsers, login } = require('./controllers/users');
 
 const { PORT = 3000, BASE_URL = 'http://localhost:3000' } = process.env;
@@ -32,7 +32,7 @@ app.post('/signup', celebrate({
   }),
 }), postUsers);
 
-// app.use(auth);
+app.use(auth);
 app.use(require('./routes/cards'));
 app.use(require('./routes/users'));
 
