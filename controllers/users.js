@@ -130,10 +130,10 @@ const patchMeAvatar = (req, res, next) => {
 
 module.exports = {
   getUsers,
+  getCurrentUser,
   getUserById,
   postUsers,
   updateUserProfile,
   patchMeAvatar,
   login,
-  getCurrentUser,
 };
