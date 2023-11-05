@@ -51,11 +51,8 @@ router.post('/signin', celebrate({
 
 router.patch('/users/me', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().email(),
-    password: Joi.string().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
   }),
 }), updateUserProfile);
 

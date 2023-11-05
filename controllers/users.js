@@ -26,6 +26,17 @@ const login = (req, res, next) => {
     });
 };
 
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
+      }
+      return res.status(200).send(user);
+    })
+    .catch((err) => next(err));
+};
+
 const postUsers = (req, res, next) => {
   const {
     name, about, avatar, email, password,
@@ -52,22 +63,6 @@ const postUsers = (req, res, next) => {
         return next(new ExistingEmailErr('Передан уже зарегистрированный email.'));
       }
       return next(err);
-    });
-};
-
-const getCurrentUser = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        return next(new NotExistErr('Пользователь не найден'));
-      }
-      res.status(200).send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return next(new BadRequestErr('Введен некорректный id пользователя!'));
-      }
-      next(err);
     });
 };
 
