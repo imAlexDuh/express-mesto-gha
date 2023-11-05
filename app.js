@@ -1,10 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
-const { Joi, errors, celebrate } = require('celebrate');
+const { errors } = require('celebrate');
 const cookieParser = require('cookie-parser');
 const router = require('./routes/default');
-const { postUsers, login } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
 
@@ -18,24 +17,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(BodyParser.json());
 app.use(BodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
-  }),
-}), login);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
-  }),
-}), postUsers);
-
 app.use(router);
 app.use(errors());
 
