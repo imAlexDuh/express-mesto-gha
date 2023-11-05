@@ -2,18 +2,24 @@ const express = require('express');
 const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { Joi, errors, celebrate } = require('celebrate');
+const cookieParser = require('cookie-parser');
+const usersRouter = require('./routes/users');
 const auth = require('./middlewares/auth');
 const { postUsers, login } = require('./controllers/users');
 
 const { PORT = 3000, BASE_URL = 'http://localhost:3000' } = process.env;
+
 const app = express();
+app.use(express.json());
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
 
 app.use(BodyParser.json());
-app.use(express.json());
+app.use(BodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
+mongoose.connect(BASE_URL);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -33,7 +39,7 @@ app.post('/signup', celebrate({
 }), postUsers);
 
 app.use(auth);
-app.use(require('./routes/cards'));
+app.use('/users', auth, usersRouter);
 app.use(require('./routes/users'));
 
 app.use(errors());
