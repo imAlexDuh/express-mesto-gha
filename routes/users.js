@@ -5,6 +5,8 @@ const {
   getUsers, getUserById, updateUserProfile, patchMeAvatar, getCurrentUser,
 } = require('../controllers/users');
 
+module.exports = router;
+
 router.get('/users', getUsers);
 router.get('/users/me', getCurrentUser);
 
@@ -26,5 +28,3 @@ router.patch('/users/me/avatar', celebrate({
     avatar: Joi.string().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
   }),
 }), patchMeAvatar);
-
-module.exports = router;
