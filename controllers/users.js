@@ -96,7 +96,7 @@ const updateUserProfile = (req, res, next) => {
       if (!user) {
         return next(new NotExistErr('Пользователь по указанному _id не найден.'));
       }
-      return res.send({ data: user });
+      return res.send({ user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
