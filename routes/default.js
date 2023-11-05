@@ -2,7 +2,8 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./users');
 const cardRouter = require('./cards');
-// const auth = require('../middlewares/auth');
+const NotExistErr = require('../errors/NotExistErr');
+const auth = require('../middlewares/auth');
 
 const { postUsers, login } = require('../controllers/users');
 
@@ -23,7 +24,10 @@ router.post('/signin', celebrate({
   }),
 }), login);
 
-router.use('/users', userRouter);
-router.use('/cards', cardRouter);
+router.use('/users', auth, userRouter);
+router.use('/cards', auth, cardRouter);
+router.use('*', auth, (req, res, next) => {
+  next(new NotExistErr('Переданы некорректные данные'));
+});
 
 module.exports = router;
