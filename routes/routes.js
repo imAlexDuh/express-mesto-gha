@@ -1,10 +1,10 @@
 const express = require('express');
-const userRouter = require('./users');
+const router = require('./users');
 const cardRouter = require('./cards');
 
 const app = express();
 
-app.use(userRouter);
+app.use(router);
 app.use(cardRouter);
 
 app.use('*', (req, res) => {

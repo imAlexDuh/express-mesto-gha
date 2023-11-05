@@ -30,7 +30,7 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        return next(new NotExistErr('Пользователь по указанному _id не найден.'));
+        return next(new NotExistErr('Пользователь по указанному не найден.'));
       }
       return res.status(200).send(user);
     })

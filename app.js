@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const BodyParser = require('body-parser');
 const { errors } = require('celebrate');
 // const auth = require('./middlewares/auth');
-const centralErrors = require('./middlewares/centralerrcontrol');
+// const centralErrors = require('./middlewares/centralerrcontrol');
 /* eslint-disable no-console */
 
 const app = express();
@@ -36,6 +36,6 @@ app.post('/signin', router);
 app.post('/signup', router);
 
 app.use(errors());
-app.use(centralErrors);
+// app.use(centralErrors);
 
 run();
