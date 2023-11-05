@@ -24,9 +24,9 @@ router.post('/signin', celebrate({
   }),
 }), login);
 
-router.use('/users', auth, userRouter);
-router.use('/cards', auth, cardRouter);
-router.use('*', auth, (req, res, next) => {
+router.use('/users', userRouter);
+router.use('/cards', cardRouter);
+router.use('*', (req, res, next) => {
   next(new NotExistErr('Переданы некорректные данные'));
 });
 
