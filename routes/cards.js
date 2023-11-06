@@ -8,7 +8,7 @@ const {
 } = require('../controllers/cards');
 
 cardsRouter.get('/cards', getCards);
-cardsRouter.post('cards', celebrate({
+cardsRouter.post('/cards', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     link: Joi.string().required().regex(URL_REGEX),

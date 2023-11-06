@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
 
   try {
     const { NODE_ENV, SECRET } = process.env;
-    payload = jwt.verify(token, NODE_ENV === 'production' ? SECRET : 'dev-secret');
+    payload = jwt.verify(token, NODE_ENV === 'production' ? SECRET : 'secretkey');
   } catch (err) {
     next(new BadAuthErr('Необходима авторизация'));
     return;

@@ -3,6 +3,7 @@ const Card = require('../models/card');
 
 const BadRequestErr = require('../errors/BadRequestErr');
 const NotExistErr = require('../errors/NotExistErr');
+const DelCardErr = require('../errors/DelCardErr');
 
 const createCard = (req, res, next) => {
   const { name, link } = req.body;
@@ -31,14 +32,22 @@ const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((cards) => {
       if (!cards) { throw new NotExistErr('Такой карточки нет.'); }
-      return res.status(200).send(cards);
+    })
+
+    .then((card) => {
+      if (req.user._id !== card.owner.toString()) {
+        throw new DelCardErr('Нельзя удалять чужие карточки');
+      }
+      Card.findByIdAndRemove(req.params.cardId)
+        .then((removeCard) => res.status(200).send({ removeCard }))
+        .catch(next);
     })
 
     .catch((err) => {
       if (err.name === 'CastError') {
         return next(new BadRequestErr('Переданы некорректные данные.'));
       }
-      return next(err);
+      next(err);
     });
 };
 
