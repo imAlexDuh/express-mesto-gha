@@ -1,3 +1,5 @@
+const URL_REGEX = /^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-/])*)?/im;
+
 const ERROR_BAD_REQUEST = 400;
 const ERROR_NOT_FOUND = 404;
 const ERROR_INTERNAL = 500;
@@ -12,4 +14,5 @@ module.exports = {
   ERROR_BAD_AUTH,
   ERROR_DEL_CARD,
   ERROR_EXIST_EMAIL,
+  URL_REGEX,
 };
