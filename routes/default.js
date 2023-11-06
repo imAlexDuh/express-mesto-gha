@@ -6,6 +6,8 @@ const auth = require('../middlewares/auth');
 
 const URL_REGEX = /^((ftp|http|https):\/\/)?(www\.)?([A-Za-zА-Яа-я0-9]{1}[A-Za-zА-Яа-я0-9-]*\.?)*\.{1}[A-Za-zА-Яа-я0-9-]{2,8}(\/([\w#!:.?+=&%@!\-/])*)?/im;
 
+const NotExistErr = require('../errors/NotExistErr');
+
 const { postUsers, login } = require('../controllers/users');
 
 router.post('/signup', celebrate({
@@ -28,5 +30,9 @@ router.post('/signin', celebrate({
 router.use(auth);
 router.use(userRouter);
 router.use(cardRouter);
+
+router.use('*', (req, res, next) => {
+  next(new NotExistErr('Такой страницы нет'));
+});
 
 module.exports = router;
