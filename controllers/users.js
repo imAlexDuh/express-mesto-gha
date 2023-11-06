@@ -19,8 +19,15 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, SECRET, { expiresIn: '7d' });
-      res.send({ token });
+
+      res
+        .cookie('jwt', token, {
+          maxAge: '604800',
+        })
+        .status(200)
+        .send({ message: 'Авторизация прошла успешно' });
     })
+
     .catch(() => {
       next(new BadAuthErr('Неправильные почта или пароль.'));
     });
