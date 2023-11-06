@@ -34,8 +34,8 @@ const deleteCard = (req, res, next) => {
       if (!cards) { throw new NotExistErr('Такой карточки нет.'); }
     })
 
-    .then((card) => {
-      if (req.user._id !== card.owner.toString()) {
+    .then((cards) => {
+      if (req.user._id !== cards.owner.toString()) {
         throw new DelCardErr('Нельзя удалять чужие карточки');
       }
       Card.findByIdAndRemove(req.params.cardId)
